@@ -8,17 +8,15 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   
-  <!-- Apple iOS Homescreen Web App Capabilities -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Self-Contained Service Worker Inline Registration Script -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swContent = `
-          const CACHE_NAME = 'rig-balance-v4';
+          const CACHE_NAME = 'rig-balance-v5';
           const ASSETS = ['./', './index.html', './manifest.json'];
 
           self.addEventListener('install', (e) => {
@@ -58,9 +56,6 @@
     body { font-family: Arial, sans-serif; margin: 12px; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; }
     .app { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 10px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin: 5px 0; width: 100%; }
-    .card { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; position: relative; }
-    .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; }
-    .val { font-size: 15px; font-weight: 700; margin-top: 2px; font-family: monospace; color: #38bdf8; }
     .card { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; position: relative; }
     .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; }
     .val { font-size: 15px; font-weight: 700; margin-top: 2px; font-family: monospace; color: #38bdf8; }
@@ -172,7 +167,6 @@
     const lbls = { B20: "Toolbox (kg)", B21: "Front Storage (kg)", B22: "Front Water Tank (L)", B23: "Mid Storage (kg)", B24: "Rear Water Tank (L)", B25: "Rear Storage (kg)", B26: "Cabin Cargo (kg)", B27: "Tub Cargo (kg)" };
     let curW = JSON.parse(JSON.stringify(defW));
     
-    // --- PWA Custom Installation Prompt Logic ---
     let deferredPrompt;
     const installBtn = document.getElementById('pwa_install_btn');
 
@@ -195,7 +189,6 @@
       installBtn.style.display = 'none';
     });
 
-    // --- Repaired Slider UI Generation Logic ---
     function buildSliders() {
       let h = "";
       Object.keys(lbls).forEach(k => {
@@ -204,7 +197,7 @@
         h += '    <label>' + lbls[k] + '</label>';
         h += '    <span><span id="val_' + k + '">' + curW[k] + '</span> kg</span>';
         h += '  </div>';
-        h += '  <input type="range" id="slide_' + k + '" min="0" max="' + maxL[k] + '" value="' + Math.floor(curW[k]) + '" oninput="upW('' + k + '', this.value)">';
+        h += '  <input type="range" id="' + k + '" min="0" max="' + maxL[k] + '" value="' + Math.floor(curW[k]) + '" oninput="upW(this.id, this.value)">';
         h += '</div>';
       });
       document.getElementById("slider_bay").innerHTML = h;
