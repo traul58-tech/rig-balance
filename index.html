@@ -18,7 +18,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swContent = `
-          const CACHE_NAME = 'rig-balance-v3';
+          const CACHE_NAME = 'rig-balance-v4';
           const ASSETS = ['./', './index.html', './manifest.json'];
 
           self.addEventListener('install', (e) => {
@@ -48,8 +48,8 @@
         const swUrl = URL.createObjectURL(blob);
 
         navigator.serviceWorker.register(swUrl, { scope: './' })
-          .then(reg => console.log('Service Worker unified and registered! Scope:', reg.scope))
-          .catch(err => console.error('Service Worker fallback engine error:', err));
+          .then(reg => console.log('Service Worker unified and registered!'))
+          .catch(err => console.error('Service Worker fallback error:', err));
       });
     }
   </script>
@@ -58,6 +58,9 @@
     body { font-family: Arial, sans-serif; margin: 12px; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; }
     .app { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 10px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin: 5px 0; width: 100%; }
+    .card { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; position: relative; }
+    .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; }
+    .val { font-size: 15px; font-weight: 700; margin-top: 2px; font-family: monospace; color: #38bdf8; }
     .card { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; position: relative; }
     .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; }
     .val { font-size: 15px; font-weight: 700; margin-top: 2px; font-family: monospace; color: #38bdf8; }
@@ -74,7 +77,6 @@
     .spec-group { background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
     .spec-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #cbd5e1; }
     
-    /* PWA Install Button Styles */
     .install-btn {
       display: none; 
       width: 100%; 
@@ -98,10 +100,9 @@
 <body>
 
   <div class="app">
-    <h3 style="margin:5px 0 0 0; color:#fff;">🌐 Universal Towing Mobile HUD</h3>
+    <h3>🌐 Universal Towing Mobile HUD</h3>
     <p style="font-size:11px; color:#64748b; margin:0 0 5px 0;">Dynamic Side-by-Side Dual Column Architecture Physics Engine.</p>
     
-    <!-- Dynamic Custom PWA Installation Banner Trigger -->
     <button id="pwa_install_btn" class="install-btn">
       📲 Install Rig Balance App (Works Offline)
     </button>
@@ -171,7 +172,7 @@
     const lbls = { B20: "Toolbox (kg)", B21: "Front Storage (kg)", B22: "Front Water Tank (L)", B23: "Mid Storage (kg)", B24: "Rear Water Tank (L)", B25: "Rear Storage (kg)", B26: "Cabin Cargo (kg)", B27: "Tub Cargo (kg)" };
     let curW = JSON.parse(JSON.stringify(defW));
     
-    // --- PWA Custom Installation Prompt Engine Logic ---
+    // --- PWA Custom Installation Prompt Logic ---
     let deferredPrompt;
     const installBtn = document.getElementById('pwa_install_btn');
 
@@ -185,17 +186,37 @@
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User installation decision outcome: ${outcome}`);
+      console.log('User prompt decision: ' + outcome);
       deferredPrompt = null;
       installBtn.style.display = 'none';
     });
 
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('App successfully installed to home screen!');
+    window.addEventListener('appinstalled', () => {
       installBtn.style.display = 'none';
     });
 
-    // --- Original Physics Engine Framework Mechanics ---
+    // --- Repaired Slider UI Generation Logic ---
+    function buildSliders() {
+      let h = "";
+      Object.keys(lbls).forEach(k => {
+        h += '<div class="slider-card">';
+        h += '  <div class="hdr">';
+        h += '    <label>' + lbls[k] + '</label>';
+        h += '    <span><span id="val_' + k + '">' + curW[k] + '</span> kg</span>';
+        h += '  </div>';
+        h += '  <input type="range" id="slide_' + k + '" min="0" max="' + maxL[k] + '" value="' + Math.floor(curW[k]) + '" oninput="upW('' + k + '', this.value)">';
+        h += '</div>';
+      });
+      document.getElementById("slider_bay").innerHTML = h;
+    }
+    
+    function upW(k, v) { 
+      curW[k] = parseFloat(v); 
+      document.getElementById("val_" + k).innerText = v; 
+      localStorage.setItem('towing_slider_weights', JSON.stringify(curW));
+      recalc(); 
+    }
+
     function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
       const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
@@ -206,21 +227,6 @@
       }
       localStorage.setItem('towing_selected_preset', k);
       recalc();
-    }
-    
-    function buildSliders() {
-      let h = "";
-      Object.keys(lbls).forEach(k => {
-        h += `<div class="slider-card"><div class="hdr"><label>\${lbls[k]}</label><span><span id="val_\${k}">\${curW[k]}</span> kg</span></div><input type="range" id="slide_\${k}" min="0" max="\${maxL[k]}" value="\${Math.floor(curW[k])}" oninput="upW('\${k}', this.value)"></div>`;
-      });
-      document.getElementById("slider_bay").innerHTML = h;
-    }
-    
-    function upW(k, v) { 
-      curW[k] = parseFloat(v); 
-      document.getElementById("val_" + k).innerText = v; 
-      localStorage.setItem('towing_slider_weights', JSON.stringify(curW));
-      recalc(); 
     }
     
     function recalc() {
