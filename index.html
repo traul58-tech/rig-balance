@@ -16,7 +16,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swContent = `
-          const CACHE_NAME = 'rig-balance-v5';
+          const CACHE_NAME = 'rig-balance-v6';
           const ASSETS = ['./', './index.html', './manifest.json'];
 
           self.addEventListener('install', (e) => {
@@ -109,6 +109,7 @@
       <div class="card" id="card_gcm"><div class="lbl">Combined GCM (B33)</div><div class="val" id="hud_gcm">0 kg</div><span class="cap" id="cap_gcm">MAX GCM: 6400kg</span></div>
       <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap">MAX AXLE: 1959kg</span></div>
       <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap">MAX AXLE: 1490kg</span></div>
+      <div class="card" id="card_van_axle"><div class="lbl">Van Axle Load / GTM</div><div class="val" id="hud_van_axle">0 kg</div><span class="cap" id="cap_van_axle">MAX AXLE: 3200kg</span></div>
     </div>
 
     <div class="main-layout">
@@ -121,6 +122,10 @@
           <option value="Y62">Nissan Patrol Y62</option>
           <option value="BT50">Mazda BT-50 SP (3.0L)</option>
           <option value="LC100">Toyota LandCruiser 100</option>
+          <option value="Prado250">LandCruiser Prado 250 Series</option>
+          <option value="Hilux">Toyota Hilux SR5 (2.8L)</option>
+          <option value="TritonMV">Mitsubishi Triton (Next-Gen MV)</option>
+          <option value="DMax">Isuzu D-MAX (3.0L)</option>
           <option value="UserDefined">User Defined Override Mode</option>
         </select>
 
@@ -142,6 +147,7 @@
           <div class="spec-row"><label>Caravan Tare weight (B15)</label><input type="number" class="input-box" id="inp_c_tare" value="2780" oninput="recalc()"></div>
           <div class="spec-row"><label>Legal ATM Capacity (B16)</label><input type="number" class="input-box" id="inp_c_atm" value="3480" oninput="recalc()"></div>
           <div class="spec-row"><label>Hitch-to-Axle Length L (B17)</label><input type="number" step="0.1" class="input-box" id="inp_c_len" value="5.0" oninput="recalc()"></div>
+          <div class="spec-row"><label>Van Legal Axle Limit</label><input type="number" class="input-box" id="inp_c_axle_limit" value="3200" oninput="recalc()"></div>
         </div>
       </div>
 
@@ -159,7 +165,11 @@
       "LC300":     [2630, 3280, 6750, 350, 2.85, 1.22, 1410, 1220],
       "Y62":       [2800, 3500, 7000, 350, 3.07, 1.34, 1540, 1260],
       "BT50":      [2035, 3100, 6000, 350, 3.12, 1.29, 990, 1045],
-      "LC100":     [2520, 3260, 6760, 350, 2.85, 1.19, 1320, 1200]
+      "LC100":     [2520, 3260, 6760, 350, 2.85, 1.19, 1320, 1200],
+      "Prado250":  [2410, 3100, 6600, 350, 2.85, 1.20, 1280, 1130],
+      "Hilux":     [2100, 3050, 5850, 350, 3.08, 1.25, 1010, 1090],
+      "TritonMV":  [2010, 3200, 6205, 350, 3.13, 1.27, 960, 1050],
+      "DMax":      [2045, 3100, 6000, 350, 3.12, 1.28, 995, 1050]
     };
     const arms = { B20: 3.75, B21: 3.0, B22: 1.8, B23: 0.0, B24: -1.5, B25: -2.25, B26: 0.0, B27: 0.0 };
     const defW = { B20: 75.3, B21: 79.1, B22: 95, B23: 89, B24: 95, B25: 75.2, B26: 205, B27: 127.6 };
@@ -235,12 +245,14 @@
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
+      const caxLimit = parseFloat(document.getElementById("inp_c_axle_limit").value) || 3200;
       
       let tQ = 0, cC = 0;
       Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
+      
       let tbm = Math.max(0, Math.round(ct + (tQ / cl)));
-
       let vATM = Math.round(ca + cC);
+      let vanAxleLoad = Math.max(0, Math.round(vATM - tbm));
       let uGVM = Math.round(vt + curW.B26 + curW.B27 + tbm);
       let tGCM = Math.round(vATM + uGVM - tbm);
       let rAx = Math.round(vr + curW.B27 + (curW.B26 * 0.35) + (tbm * (1 + (vo / vw))));
@@ -252,11 +264,13 @@
       document.getElementById("hud_gcm").innerText = tGCM + " kg";
       document.getElementById("hud_rear").innerText = rAx + " kg";
       document.getElementById("hud_front").innerText = fAx + " kg";
+      document.getElementById("hud_van_axle").innerText = vanAxleLoad + " kg";
       
       document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
       document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
       document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
       document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
+      document.getElementById("cap_van_axle").innerText = "MAX AXLE: " + caxLimit + "kg";
       
       document.getElementById("card_tbm").style.borderColor = (tbm > vb || tbm < (vATM * 0.08)) ? "#ef4444" : "#334155";
       document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
@@ -264,8 +278,9 @@
       document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
       document.getElementById("card_rear").style.borderColor = (rAx > 1959) ? "#ef4444" : "#334155";
       document.getElementById("card_front").style.borderColor = (fAx > 1490) ? "#ef4444" : "#334155";
+      document.getElementById("card_van_axle").style.borderColor = (vanAxleLoad > caxLimit) ? "#ef4444" : "#334155";
 
-      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl };
+      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
       localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
     }
     
@@ -296,6 +311,7 @@
         document.getElementById("inp_c_tare").value = o.ca;
         document.getElementById("inp_c_atm").value = o.cm;
         document.getElementById("inp_c_len").value = o.cl;
+        if(o.caxLimit) document.getElementById("inp_c_axle_limit").value = o.caxLimit;
         recalc();
       }
     };
