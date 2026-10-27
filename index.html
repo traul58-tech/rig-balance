@@ -4,10 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Universal Rig Balance Mobile HUD</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swContent = `
+          const CACHE_NAME = 'rig-balance-v6';
+          const ASSETS = ['./', './index.html', './manifest.json'];
+
+          self.addEventListener('install', (e) => {
+            e.waitUntil(
+              caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+            );
+            self.skipWaiting();
+          });
+
+          self.addEventListener('activate', (e) => {
+            e.waitUntil(
+              caches.keys().then((keys) => Promise.all(
+                keys.map((key) => { if (key !== CACHE_NAME) return caches.delete(key); })
+              ))
+            );
+            self.clients.claim();
+          });
+
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(
+              caches.match(e.request).then((cachedResponse) => cachedResponse || fetch(e.request))
+            );
+          });
+        `;
+
+        const blob = new Blob([swContent], { type: 'text/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+
+        navigator.serviceWorker.register(swUrl, { scope: './' })
+          .then(reg => console.log('Service Worker unified and registered!'))
+          .catch(err => console.error('Service Worker fallback error:', err));
+      });
+    }
+  </script>
+
   <style>
     body { font-family: Arial, sans-serif; margin: 12px; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; }
     .app { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 10px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; margin: 5px 0; width: 100%; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin: 5px 0; width: 100%; }
     .card { background: #1e293b; padding: 8px; border-radius: 6px; border: 1px solid #334155; position: relative; }
     .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; }
     .val { font-size: 15px; font-weight: 700; margin-top: 2px; font-family: monospace; color: #38bdf8; }
@@ -23,22 +71,45 @@
     .sect-title { margin: 4px 0 2px 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
     .spec-group { background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
     .spec-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #cbd5e1; }
+    
+    .install-btn {
+      display: none; 
+      width: 100%; 
+      padding: 14px; 
+      background: linear-gradient(135deg, #38bdf8, #0284c7); 
+      color: #fff; 
+      border: none; 
+      border-radius: 6px; 
+      font-weight: bold; 
+      font-size: 14px; 
+      cursor: pointer; 
+      margin-bottom: 8px; 
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+      transition: transform 0.1s ease;
+    }
+    .install-btn:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
 
   <div class="app">
-    <h3 style="margin:5px 0 0 0; color:#fff;">🌐 Universal Towing Mobile HUD</h3>
+    <h3>🌐 Universal Towing Mobile HUD</h3>
     <p style="font-size:11px; color:#64748b; margin:0 0 5px 0;">Dynamic Side-by-Side Dual Column Architecture Physics Engine.</p>
+    
+    <button id="pwa_install_btn" class="install-btn">
+      📲 Install Rig Balance App (Works Offline)
+    </button>
     
     <div class="grid">
       <div class="card" id="card_tbm"><div class="lbl">Live Towball Mass (B30)</div><div class="val" id="hud_tbm">0 kg</div><span class="cap" id="cap_tbm">MAX TBM: 350kg</span></div>
-      <div class="card" id="card_tbm_pct"><div class="lbl">TBM % of Caravan</div><div class="val" id="hud_tbm_pct">0.0%</div><span class="cap" id="cap_tbm_pct">Target: 8.0% - 15.0%</span></div>
       <div class="card" id="card_gvm"><div class="lbl">Vehicle GVM (B32)</div><div class="val" id="hud_gvm">0 kg</div><span class="cap" id="cap_gvm">MAX GVM: 3350kg</span></div>
       <div class="card" id="vanatm"><div class="lbl">Trailer ATM (B31)</div><div class="val" id="hud_vanatm">0 kg</div><span class="cap" id="cap_vanatm">MAX ATM: 3480kg</span></div>
       <div class="card" id="card_gcm"><div class="lbl">Combined GCM (B33)</div><div class="val" id="hud_gcm">0 kg</div><span class="cap" id="cap_gcm">MAX GCM: 6400kg</span></div>
       <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap">MAX AXLE: 1959kg</span></div>
       <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap">MAX AXLE: 1490kg</span></div>
+      <div class="card" id="card_van_axle"><div class="lbl">Van Axle Load / GTM</div><div class="val" id="hud_van_axle">0 kg</div><span class="cap" id="cap_van_axle">MAX AXLE: 3200kg</span></div>
     </div>
 
     <div class="main-layout">
@@ -51,6 +122,10 @@
           <option value="Y62">Nissan Patrol Y62</option>
           <option value="BT50">Mazda BT-50 SP (3.0L)</option>
           <option value="LC100">Toyota LandCruiser 100</option>
+          <option value="Prado250">LandCruiser Prado 250 Series</option>
+          <option value="Hilux">Toyota Hilux SR5 (2.8L)</option>
+          <option value="TritonMV">Mitsubishi Triton (Next-Gen MV)</option>
+          <option value="DMax">Isuzu D-MAX (3.0L)</option>
           <option value="UserDefined">User Defined Override Mode</option>
         </select>
 
@@ -72,6 +147,7 @@
           <div class="spec-row"><label>Caravan Tare weight (B15)</label><input type="number" class="input-box" id="inp_c_tare" value="2780" oninput="recalc()"></div>
           <div class="spec-row"><label>Legal ATM Capacity (B16)</label><input type="number" class="input-box" id="inp_c_atm" value="3480" oninput="recalc()"></div>
           <div class="spec-row"><label>Hitch-to-Axle Length L (B17)</label><input type="number" step="0.1" class="input-box" id="inp_c_len" value="5.0" oninput="recalc()"></div>
+          <div class="spec-row"><label>Van Legal Axle Limit</label><input type="number" class="input-box" id="inp_c_axle_limit" value="3200" oninput="recalc()"></div>
         </div>
       </div>
 
@@ -85,17 +161,65 @@
   <script>
     const pz = {
       "NG Ranger": [2345, 3350, 6400, 350, 3.27, 1.31, 1044, 1301],
-      "LC200": [2740, 3350, 6850, 350, 2.85, 1.21, 1450, 1290],
-      "LC300": [2630, 3280, 6750, 350, 2.85, 1.22, 1410, 1220],
-      "Y62": [2800, 3500, 7000, 350, 3.07, 1.34, 1540, 1260],
-      "BT50": [2035, 3100, 6000, 350, 3.12, 1.29, 990, 1045],
-      "LC100": [2520, 3260, 6760, 350, 2.85, 1.19, 1320, 1200]
+      "LC200":     [2740, 3350, 6850, 350, 2.85, 1.21, 1450, 1290],
+      "LC300":     [2630, 3280, 6750, 350, 2.85, 1.22, 1410, 1220],
+      "Y62":       [2800, 3500, 7000, 350, 3.07, 1.34, 1540, 1260],
+      "BT50":      [2035, 3100, 6000, 350, 3.12, 1.29, 990, 1045],
+      "LC100":     [2520, 3260, 6760, 350, 2.85, 1.19, 1320, 1200],
+      "Prado250":  [2410, 3100, 6600, 350, 2.85, 1.20, 1280, 1130],
+      "Hilux":     [2100, 3050, 5850, 350, 3.08, 1.25, 1010, 1090],
+      "TritonMV":  [2010, 3200, 6205, 350, 3.13, 1.27, 960, 1050],
+      "DMax":      [2045, 3100, 6000, 350, 3.12, 1.28, 995, 1050]
     };
     const arms = { B20: 3.75, B21: 3.0, B22: 1.8, B23: 0.0, B24: -1.5, B25: -2.25, B26: 0.0, B27: 0.0 };
     const defW = { B20: 75.3, B21: 79.1, B22: 95, B23: 89, B24: 95, B25: 75.2, B26: 205, B27: 127.6 };
     const maxL = { B20: 150, B21: 150, B22: 150, B23: 500, B24: 150, B25: 150, B26: 400, B27: 600 };
-    const lbls = { B20: "Toolbox (kg)", B21: "Tunnel Boot (kg)", B22: "Front Water Tank (L)", B23: "Mid Storage (kg)", B24: "Rear Water Tank (L)", B25: "Rear Locker (kg)", B26: "Cabin Cargo (kg)", B27: "Tub Cargo (kg)" };
+    const lbls = { B20: "Toolbox (kg)", B21: "Front Storage (kg)", B22: "Front Water Tank (L)", B23: "Mid Storage (kg)", B24: "Rear Water Tank (L)", B25: "Rear Storage (kg)", B26: "Cabin Cargo (kg)", B27: "Tub Cargo (kg)" };
     let curW = JSON.parse(JSON.stringify(defW));
+    
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwa_install_btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('User prompt decision: ' + outcome);
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+    });
+
+    function buildSliders() {
+      let h = "";
+      Object.keys(lbls).forEach(k => {
+        h += '<div class="slider-card">';
+        h += '  <div class="hdr">';
+        h += '    <label>' + lbls[k] + '</label>';
+        h += '    <span><span id="val_' + k + '">' + curW[k] + '</span> kg</span>';
+        h += '  </div>';
+        h += '  <input type="range" id="' + k + '" min="0" max="' + maxL[k] + '" value="' + Math.floor(curW[k]) + '" oninput="upW(this.id, this.value)">';
+        h += '</div>';
+      });
+      document.getElementById("slider_bay").innerHTML = h;
+    }
+    
+    function upW(k, v) { 
+      curW[k] = parseFloat(v); 
+      document.getElementById("val_" + k).innerText = v; 
+      localStorage.setItem('towing_slider_weights', JSON.stringify(curW));
+      recalc(); 
+    }
+
     function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
       const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
@@ -104,16 +228,10 @@
         let p = pz[k];
         ids.forEach((id, i) => document.getElementById("inp_" + id).value = p[i]);
       }
+      localStorage.setItem('towing_selected_preset', k);
       recalc();
     }
-    function buildSliders() {
-      let h = "";
-      Object.keys(lbls).forEach(k => {
-        h += `<div class="slider-card"><div class="hdr"><label>${lbls[k]}</label><span><span id="val_${k}">${curW[k]}</span> kg</span></div><input type="range" id="slide_${k}" min="0" max="${maxL[k]}" value="${Math.floor(curW[k])}" oninput="upW('${k}', this.value)"></div>`;
-      });
-      document.getElementById("slider_bay").innerHTML = h;
-    }
-    function upW(k, v) { curW[k] = parseFloat(v); document.getElementById("val_" + k).innerText = v; recalc(); }
+    
     function recalc() {
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
       const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
@@ -127,35 +245,75 @@
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
+      const caxLimit = parseFloat(document.getElementById("inp_c_axle_limit").value) || 3200;
+      
       let tQ = 0, cC = 0;
       Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
+      
       let tbm = Math.max(0, Math.round(ct + (tQ / cl)));
       let vATM = Math.round(ca + cC);
+      let vanAxleLoad = Math.max(0, Math.round(vATM - tbm));
       let uGVM = Math.round(vt + curW.B26 + curW.B27 + tbm);
       let tGCM = Math.round(vATM + uGVM - tbm);
       let rAx = Math.round(vr + curW.B27 + (curW.B26 * 0.35) + (tbm * (1 + (vo / vw))));
       let fAx = Math.round(vf + (curW.B26 * 0.65) - (tbm * (vo / vw)));
-      let tbmPct = vATM > 0 ? ((tbm / vATM) * 100).toFixed(1) : "0.0";
+      
       document.getElementById("hud_tbm").innerText = tbm + " kg";
-      document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
       document.getElementById("hud_gvm").innerText = uGVM + " kg";
       document.getElementById("hud_vanatm").innerText = vATM + " kg";
       document.getElementById("hud_gcm").innerText = tGCM + " kg";
       document.getElementById("hud_rear").innerText = rAx + " kg";
       document.getElementById("hud_front").innerText = fAx + " kg";
+      document.getElementById("hud_van_axle").innerText = vanAxleLoad + " kg";
+      
       document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
       document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
       document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
       document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
-      document.getElementById("card_tbm").style.borderColor = (tbm > vb) ? "#ef4444" : "#334155";
-      document.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
+      document.getElementById("cap_van_axle").innerText = "MAX AXLE: " + caxLimit + "kg";
+      
+      document.getElementById("card_tbm").style.borderColor = (tbm > vb || tbm < (vATM * 0.08)) ? "#ef4444" : "#334155";
       document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
       document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
       document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
       document.getElementById("card_rear").style.borderColor = (rAx > 1959) ? "#ef4444" : "#334155";
       document.getElementById("card_front").style.borderColor = (fAx > 1490) ? "#ef4444" : "#334155";
+      document.getElementById("card_van_axle").style.borderColor = (vanAxleLoad > caxLimit) ? "#ef4444" : "#334155";
+
+      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
+      localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
+    }
+    
+    window.onload = function() { 
+      const savedWeights = localStorage.getItem('towing_slider_weights');
+      if (savedWeights) {
+        curW = JSON.parse(savedWeights);
       }
-    window.onload = function() { buildSliders(); applyVehiclePreset("NG Ranger"); 
+      
+      buildSliders(); 
+      
+      const savedPreset = localStorage.getItem('towing_selected_preset') || "NG Ranger";
+      document.getElementById("veh_select").value = savedPreset;
+      applyVehiclePreset(savedPreset);
+
+      const savedOverrides = localStorage.getItem('towing_input_overrides');
+      if (savedOverrides && savedPreset === "UserDefined") {
+        const o = JSON.parse(savedOverrides);
+        document.getElementById("inp_v_tare").value = o.vt;
+        document.getElementById("inp_v_gvm").value = o.vg;
+        document.getElementById("inp_v_gcm").value = o.vc;
+        document.getElementById("inp_v_tbm").value = o.vb;
+        document.getElementById("inp_v_wb").value = o.vw;
+        document.getElementById("inp_v_oh").value = o.vo;
+        document.getElementById("inp_v_rear").value = o.vr;
+        document.getElementById("inp_v_front").value = o.vf;
+        document.getElementById("inp_c_tbm").value = o.ct;
+        document.getElementById("inp_c_tare").value = o.ca;
+        document.getElementById("inp_c_atm").value = o.cm;
+        document.getElementById("inp_c_len").value = o.cl;
+        if(o.caxLimit) document.getElementById("inp_c_axle_limit").value = o.caxLimit;
+        recalc();
+      }
     };
   </script>
 </body>
