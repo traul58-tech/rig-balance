@@ -137,8 +137,8 @@
           <div class="spec-row"><label>Max Towball Rating (B7)</label><input type="number" class="input-box" id="inp_v_tbm" oninput="recalc()"></div>
           <div class="spec-row"><label>Wheelbase Span T (B8)</label><input type="number" step="0.01" class="input-box" id="inp_v_wb" oninput="recalc()"></div>
           <div class="spec-row"><label>Towbar Overhang H (B9)</label><input type="number" step="0.01" class="input-box" id="inp_v_oh" oninput="recalc()"></div>
-          <div class="spec-row"><label>Unladen Rear Axle (B10)</label><input type="number" class="input-box" id="inp_v_rear" oninput="recalc()"></div>
-          <div class="spec-row"><label>Unladen Front Axle (B11)</label><input type="number" class="input-box" id="inp_v_front" oninput="recalc()"></div>
+          <div class="spec-row"><label>Max Rear Axle Rating</label><input type="number" class="input-box" id="inp_v_max_rear" oninput="recalc()"></div>
+          <div class="spec-row"><label>Max Front Axle Rating</label><input type="number" class="input-box" id="inp_v_max_front" oninput="recalc()"></div>
         </div>
 
         <div class="sect-title">🚐 Caravan User Defined Blueprint (Rows 14-17)</div>
@@ -220,15 +220,32 @@
       recalc(); 
     }
 
-    function applyVehiclePreset(k) {
+        function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
-      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
-      ids.forEach(id => document.getElementById("inp_" + id).disabled = !isUD);
+      // Includes the max limits inside the programmatic layout controller loop
+      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front", "v_max_rear", "v_max_front"];
+      
+      ids.forEach(id => {
+        if(document.getElementById("inp_" + id)) {
+          document.getElementById("inp_" + id).disabled = !isUD;
+        }
+      });
+      
       if (!isUD) {
         let p = pz[k];
-        ids.forEach((id, i) => document.getElementById("inp_" + id).value = p[i]);
+        document.getElementById("inp_v_tare").value = p.tare;
+        document.getElementById("inp_v_gvm").value = p.gvm;
+        document.getElementById("inp_v_gcm").value = p.gcm;
+        document.getElementById("inp_v_tbm").value = p.tbm;
+        document.getElementById("inp_v_wb").value = p.wb;
+        document.getElementById("inp_v_oh").value = p.oh;
+        document.getElementById("inp_v_rear").value = p.rear;
+        document.getElementById("inp_v_front").value = p.front;
+        
+        // ⚡ CRITICAL FIX: Forces the background elements to accept the true capacities
+        if(document.getElementById("inp_v_max_rear")) document.getElementById("inp_v_max_rear").value = p.maxRear;
+        if(document.getElementById("inp_v_max_front")) document.getElementById("inp_v_max_front").value = p.maxFront;
       }
-      localStorage.setItem('towing_selected_preset', k);
       recalc();
     }
     
