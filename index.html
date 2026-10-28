@@ -264,7 +264,9 @@
   const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
   const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
   const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
-
+  const vmr = parseFloat(document.getElementById("inp_v_max_rear").value) || 0;
+  const vmf = parseFloat(document.getElementById("inp_v_max_front").value) || 0;
+  const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
   let tQ = 0, cC = 0;
   Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
 
