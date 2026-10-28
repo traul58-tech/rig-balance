@@ -107,8 +107,9 @@
       <div class="card" id="card_gvm"><div class="lbl">Vehicle GVM (B32)</div><div class="val" id="hud_gvm">0 kg</div><span class="cap" id="cap_gvm">MAX GVM: 3350kg</span></div>
       <div class="card" id="vanatm"><div class="lbl">Trailer ATM (B31)</div><div class="val" id="hud_vanatm">0 kg</div><span class="cap" id="cap_vanatm">MAX ATM: 3480kg</span></div>
       <div class="card" id="card_gcm"><div class="lbl">Combined GCM (B33)</div><div class="val" id="hud_gcm">0 kg</div><span class="cap" id="cap_gcm">MAX GCM: 6400kg</span></div>
-      <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap">MAX AXLE: 1959kg</span></div>
-      <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap">MAX AXLE: 1490kg</span></div>
+      <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap" id="cap_rear">MAX AXLE: 1959kg</span></div>
+      <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap" id="cap_front">MAX AXLE: 1490kg</span></div>
+
       <div class="card" id="card_van_axle"><div class="lbl">Van Axle Load / GTM</div><div class="val" id="hud_van_axle">0 kg</div><span class="cap" id="cap_van_axle">MAX AXLE: 3200kg</span></div>
     </div>
 
@@ -137,8 +138,8 @@
           <div class="spec-row"><label>Max Towball Rating (B7)</label><input type="number" class="input-box" id="inp_v_tbm" oninput="recalc()"></div>
           <div class="spec-row"><label>Wheelbase Span T (B8)</label><input type="number" step="0.01" class="input-box" id="inp_v_wb" oninput="recalc()"></div>
           <div class="spec-row"><label>Towbar Overhang H (B9)</label><input type="number" step="0.01" class="input-box" id="inp_v_oh" oninput="recalc()"></div>
-          <div class="spec-row"><label>Unladen Rear Axle (B10)</label><input type="number" class="input-box" id="inp_v_rear" oninput="recalc()"></div>
-          <div class="spec-row"><label>Unladen Front Axle (B11)</label><input type="number" class="input-box" id="inp_v_front" oninput="recalc()"></div>
+          <div class="spec-row"><label>Max Rear Axle Rating</label><input type="number" class="input-box" id="inp_v_max_rear" oninput="recalc()"></div>
+          <div class="spec-row"><label>Max Front Axle Rating</label><input type="number" class="input-box" id="inp_v_max_front" oninput="recalc()"></div>
         </div>
 
         <div class="sect-title">🚐 Caravan User Defined Blueprint (Rows 14-17)</div>
@@ -160,16 +161,16 @@
 
   <script>
     const pz = {
-      "NG Ranger": [2345, 3350, 6400, 350, 3.27, 1.31, 1044, 1301],
-      "LC200":     [2740, 3350, 6850, 350, 2.85, 1.21, 1450, 1290],
-      "LC300":     [2630, 3280, 6750, 350, 2.85, 1.22, 1410, 1220],
-      "Y62":       [2800, 3500, 7000, 350, 3.07, 1.34, 1540, 1260],
-      "BT50":      [2035, 3100, 6000, 350, 3.12, 1.29, 990, 1045],
-      "LC100":     [2520, 3260, 6760, 350, 2.85, 1.19, 1320, 1200],
-      "Prado250":  [2410, 3100, 6600, 350, 2.85, 1.20, 1280, 1130],
-      "Hilux":     [2100, 3050, 5850, 350, 3.08, 1.25, 1010, 1090],
-      "TritonMV":  [2010, 3200, 6205, 350, 3.13, 1.27, 960, 1050],
-      "DMax":      [2045, 3100, 6000, 350, 3.12, 1.28, 995, 1050]
+      "NG Ranger": { tare: 2345, gvm: 3350, gcm: 6400, tbm: 350, wb: 3.27, oh: 1.31, rear: 1044, front: 1301, maxRear: 1959, maxFront: 1490 },
+      "LC200":     { tare: 2740, gvm: 3350, gcm: 6850, tbm: 350, wb: 2.85, oh: 1.21, rear: 1450, front: 1290, maxRear: 1950, maxFront: 1630 },
+      "LC300":     { tare: 2630, gvm: 3280, gcm: 6750, tbm: 350, wb: 2.85, oh: 1.22, rear: 1410, front: 1220, maxRear: 1920, maxFront: 1630 },
+      "Y62":       { tare: 2800, gvm: 3500, gcm: 7000, tbm: 350, wb: 3.07, oh: 1.34, rear: 1540, front: 1260, maxRear: 2030, maxFront: 1650 },
+      "BT50":      { tare: 2035, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.12, oh: 1.29, rear: 990,  front: 1045, maxRear: 1910, maxFront: 1450 },
+      "LC100":     { tare: 2520, gvm: 3260, gcm: 6760, tbm: 350, wb: 2.85, oh: 1.19, rear: 1320, front: 1200, maxRear: 1950, maxFront: 1300 },
+      "Prado 250": { tare: 2450, gvm: 3100, gcm: 6600, tbm: 350, wb: 2.85, oh: 1.22, rear: 1180, front: 1270, maxRear: 1800, maxFront: 1450 },
+      "Hilux SR5": { tare: 2110, gvm: 3050, gcm: 5850, tbm: 350, wb: 3.09, oh: 1.25, rear: 960,  front: 1150, maxRear: 1920, maxFront: 1350 },
+      "Triton MV": { tare: 2170, gvm: 3200, gcm: 6200, tbm: 350, wb: 3.13, oh: 1.25, rear: 990,  front: 1180, maxRear: 1985, maxFront: 1450 },
+      "D-MAX 3.0": { tare: 2115, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.13, oh: 1.28, rear: 975,  front: 1140, maxRear: 1910, maxFront: 1450 }
     };
     const arms = { B20: 3.75, B21: 3.0, B22: 1.8, B23: 0.0, B24: -1.5, B25: -2.25, B26: 0.0, B27: 0.0 };
     const defW = { B20: 75.3, B21: 79.1, B22: 95, B23: 89, B24: 95, B25: 75.2, B26: 205, B27: 127.6 };
@@ -222,67 +223,85 @@
 
     function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
-      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
-      ids.forEach(id => document.getElementById("inp_" + id).disabled = !isUD);
+      // Includes the max limits inside the programmatic layout controller loop
+      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front", "v_max_rear", "v_max_front"];
+      
+      ids.forEach(id => {
+        if(document.getElementById("inp_" + id)) {
+          document.getElementById("inp_" + id).disabled = !isUD;
+        }
+      });
+      
       if (!isUD) {
         let p = pz[k];
-        ids.forEach((id, i) => document.getElementById("inp_" + id).value = p[i]);
+        document.getElementById("inp_v_tare").value = p.tare;
+        document.getElementById("inp_v_gvm").value = p.gvm;
+        document.getElementById("inp_v_gcm").value = p.gcm;
+        document.getElementById("inp_v_tbm").value = p.tbm;
+        document.getElementById("inp_v_wb").value = p.wb;
+        document.getElementById("inp_v_oh").value = p.oh;
+        document.getElementById("inp_v_rear").value = p.rear;
+        document.getElementById("inp_v_front").value = p.front;
+        
+        // ⚡ CRITICAL FIX: Forces the background elements to accept the true capacities
+        if(document.getElementById("inp_v_max_rear")) document.getElementById("inp_v_max_rear").value = p.maxRear;
+        if(document.getElementById("inp_v_max_front")) document.getElementById("inp_v_max_front").value = p.maxFront;
       }
-      localStorage.setItem('towing_selected_preset', k);
       recalc();
     }
     
     function recalc() {
-      const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
-      const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
-      const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
-      const vb = parseFloat(document.getElementById("inp_v_tbm").value) || 0;
-      const vw = parseFloat(document.getElementById("inp_v_wb").value) || 1;
-      const vo = parseFloat(document.getElementById("inp_v_oh").value) || 0;
-      const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
-      const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
-      const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
-      const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
-      const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
-      const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
-      const caxLimit = parseFloat(document.getElementById("inp_c_axle_limit").value) || 3200;
-      
-      let tQ = 0, cC = 0;
-      Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
-      
-      let tbm = Math.max(0, Math.round(ct + (tQ / cl)));
-      let vATM = Math.round(ca + cC);
-      let vanAxleLoad = Math.max(0, Math.round(vATM - tbm));
-      let uGVM = Math.round(vt + curW.B26 + curW.B27 + tbm);
-      let tGCM = Math.round(vATM + uGVM - tbm);
-      let rAx = Math.round(vr + curW.B27 + (curW.B26 * 0.35) + (tbm * (1 + (vo / vw))));
-      let fAx = Math.round(vf + (curW.B26 * 0.65) - (tbm * (vo / vw)));
-      
-      document.getElementById("hud_tbm").innerText = tbm + " kg";
-      document.getElementById("hud_gvm").innerText = uGVM + " kg";
-      document.getElementById("hud_vanatm").innerText = vATM + " kg";
-      document.getElementById("hud_gcm").innerText = tGCM + " kg";
-      document.getElementById("hud_rear").innerText = rAx + " kg";
-      document.getElementById("hud_front").innerText = fAx + " kg";
-      document.getElementById("hud_van_axle").innerText = vanAxleLoad + " kg";
-      
-      document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
-      document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
-      document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
-      document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
-      document.getElementById("cap_van_axle").innerText = "MAX AXLE: " + caxLimit + "kg";
-      
-      document.getElementById("card_tbm").style.borderColor = (tbm > vb || tbm < (vATM * 0.08)) ? "#ef4444" : "#334155";
-      document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
-      document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
-      document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
-      document.getElementById("card_rear").style.borderColor = (rAx > 1959) ? "#ef4444" : "#334155";
-      document.getElementById("card_front").style.borderColor = (fAx > 1490) ? "#ef4444" : "#334155";
-      document.getElementById("card_van_axle").style.borderColor = (vanAxleLoad > caxLimit) ? "#ef4444" : "#334155";
+       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
+       const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
+       const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
+       const vb = parseFloat(document.getElementById("inp_v_tbm").value) || 0;
+       const vw = parseFloat(document.getElementById("inp_v_wb").value) || 1;
+       const vo = parseFloat(document.getElementById("inp_v_oh").value) || 0;
+       const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
+       const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
 
-      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
-      localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
-    }
+       const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
+       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
+       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
+       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
+       const vmr = parseFloat(document.getElementById("inp_v_max_rear").value) || 0;
+       const vmf = parseFloat(document.getElementById("inp_v_max_front").value) || 0;
+       const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
+       let tQ = 0, cC = 0;
+       Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
+
+       let tbm = Math.max(0, Math.round(ct + (tQ / cl)));
+       let vATM = Math.round(ca + cC);
+       let uGVM = Math.round(vt + curW.B26 + curW.B27 + tbm);
+       let tGCM = Math.round(vATM + uGVM - tbm);
+
+       let rAx = Math.round(vr + curW.B27 + (curW.B26 * 0.35) + (tbm * (1 + (vo / vw))));
+       let fAx = Math.round(vf + (curW.B26 * 0.65) - (tbm * (vo / vw)));
+
+       document.getElementById("hud_tbm").innerText = tbm + " kg";
+       document.getElementById("hud_gvm").innerText = uGVM + " kg";
+       document.getElementById("hud_vanatm").innerText = vATM + " kg";
+       document.getElementById("hud_gcm").innerText = tGCM + " kg";
+       document.getElementById("hud_rear").innerText = rAx + " kg";
+       document.getElementById("hud_front").innerText = fAx + " kg";
+
+       document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
+       document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
+       document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
+       document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
+
+       document.getElementById("card_tbm").style.borderColor = (tbm > vb || tbm < (vATM * 0.08)) ? "#ef4444" : "#334155";
+       document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
+       document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
+       document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
+  
+       document.getElementById("cap_rear").innerText = "MAX AXLE: " + vmr + "kg";
+       document.getElementById("cap_front").innerText = "MAX AXLE: " + vmf + "kg";
+
+       document.getElementById("card_rear").style.borderColor = (rAx > vmr) ? "#ef4444" : "#334155";
+       document.getElementById("card_front").style.borderColor = (fAx > vmf) ? "#ef4444" : "#334155";
+      }
+
     
     window.onload = function() { 
       const savedWeights = localStorage.getItem('towing_slider_weights');
