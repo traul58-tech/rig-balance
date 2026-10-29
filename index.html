@@ -112,8 +112,8 @@
       <div class="card" id="card_gvm"><div class="lbl">Vehicle GVM (B32)</div><div class="val" id="hud_gvm">0 kg</div><span class="cap" id="cap_gvm">MAX GVM: 3350kg</span></div>
       <div class="card" id="vanatm"><div class="lbl">Trailer ATM (B31)</div><div class="val" id="hud_vanatm">0 kg</div><span class="cap" id="cap_vanatm">MAX ATM: 3480kg</span></div>
       <div class="card" id="card_gcm"><div class="lbl">Combined GCM (B33)</div><div class="val" id="hud_gcm">0 kg</div><span class="cap" id="cap_gcm">MAX GCM: 6400kg</span></div>
-      <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap">MAX AXLE: 1959kg</span></div>
-      <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap">MAX AXLE: 1490kg</span></div>
+      <div class="card" id="card_rear"><div class="lbl">Rear Axle Load (B34)</div><div class="val" id="hud_rear">0 kg</div><span class="cap" id="cap_rear">MAX AXLE: 1959kg</span></div>
+      <div class="card" id="card_front"><div class="lbl">Front Axle Load (B35)</div><div class="val" id="hud_front">0 kg</div><span class="cap" id="cap_front">MAX AXLE: 1490kg</span></div>
       <div class="card" id="card_van_axle"><div class="lbl">Van Axle Load / GTM</div><div class="val" id="hud_van_axle">0 kg</div><span class="cap" id="cap_van_axle">MAX AXLE: 3200kg</span></div>
     </div>
 
@@ -227,11 +227,9 @@
 
     function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
-      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front", "v_max_rear", "v_max_front"];
+      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
       ids.forEach(id => {
-        if(document.getElementById("inp_" + id)) {
-          document.getElementById("inp_" + id).disabled = !isUD;
-        }
+        if(document.getElementById("inp_" + id)) document.getElementById("inp_" + id).disabled = !isUD;
       });
       if (!isUD) {
         let p = pz[k];
@@ -243,13 +241,15 @@
         document.getElementById("inp_v_oh").value = p.oh;
         document.getElementById("inp_v_rear").value = p.rear;
         document.getElementById("inp_v_front").value = p.front;
-        document.getElementById("inp_v_max_rear").value = p.maxRear;
-        document.getElementById("inp_v_max_front").value = p.maxFront;
       }
       recalc();
     }
 
     function recalc() {
+      // 📡 Direct-Read Fleet Preset Tracker
+      const selVeh = document.getElementById("veh_select").value;
+      const isUD = (selVeh === "UserDefined");
+      
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
       const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
       const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
@@ -258,11 +258,16 @@
       const vo = parseFloat(document.getElementById("inp_v_oh").value) || 0;
       const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
       const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
+
+      // ⚡ CRITICAL FIX: Direct-Read the true limits from your data tables, bypassing missing text boxes entirely!
+      const vmr = !isUD ? pz[selVeh].maxRear : 1959;
+      const vmf = !isUD ? pz[selVeh].maxFront : 1490;
+
       const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
-      const caxLimit = parseFloat(document.getElementById("inp_c_axle_limit").value) || 3200;
+
       
       let tQ = 0, cC = 0;
       Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
