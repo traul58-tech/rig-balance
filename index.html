@@ -246,6 +246,8 @@
       let fAx = Math.round(vf + (curW.B26 * 0.65) - (tbm * (vo / vw)));
 
       document.getElementById("hud_tbm").innerText = tbm + " kg";
+      let tbmPct = vATM > 0 ? ((tbm / vATM) * 100).toFixed(1) : "0.0";
+      document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
       document.getElementById("hud_gvm").innerText = uGVM + " kg";
       document.getElementById("hud_vanatm").innerText = vATM + " kg";
       document.getElementById("hud_gcm").innerText = tGCM + " kg";
@@ -259,7 +261,7 @@
       document.getElementById("cap_rear").innerText = "MAX AXLE: " + vmr + "kg";
       document.getElementById("cap_front").innerText = "MAX AXLE: " + vmf + "kg";
 
-      document.getElementById("card_tbm").style.borderColor = (tbm > vb || tbm < (vATM * 0.08)) ? "#ef4444" : "#334155";
+      document.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
       document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
       document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
       document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
