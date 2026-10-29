@@ -259,52 +259,56 @@
       const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
       const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
 
-      // ⚡ CRITICAL FIX: Direct-Read the true limits from your data tables, bypassing missing text boxes entirely!
-      const vmr = !isUD ? pz[selVeh].maxRear : 1959;
-      const vmf = !isUD ? pz[selVeh].maxFront : 1490;
+      // ⚡ DIRECT READ ACCESS: Reads the limits out of the database array based on dropdown choice
+      const vmr = !isUD ? (pz[selVeh].maxRear || 1959) : 1959;
+      const vmf = !isUD ? (pz[selVeh].maxFront || 1490) : 1490;
 
       const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
 
-      
+
       let tQ = 0, cC = 0;
       Object.keys(arms).forEach(k => { if (k !== "B26" && k !== "B27") { tQ += curW[k] * arms[k]; cC += curW[k]; } });
-      
+
       let tbm = Math.max(0, Math.round(ct + (tQ / cl)));
       let vATM = Math.round(ca + cC);
-      let vanAxleLoad = Math.max(0, Math.round(vATM - tbm));
       let uGVM = Math.round(vt + curW.B26 + curW.B27 + tbm);
       let tGCM = Math.round(vATM + uGVM - tbm);
+
       let rAx = Math.round(vr + curW.B27 + (curW.B26 * 0.35) + (tbm * (1 + (vo / vw))));
       let fAx = Math.round(vf + (curW.B26 * 0.65) - (tbm * (vo / vw)));
-      
-      document.getElementById("hud_tbm").innerText = tbm + " kg";
       let tbmPct = vATM > 0 ? ((tbm / vATM) * 100).toFixed(1) : "0.0";
-      document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
-      document.getElementById("hud_gvm").innerText = uGVM + " kg";
-      document.getElementById("hud_vanatm").innerText = vATM + " kg";
-      document.getElementById("hud_gcm").innerText = tGCM + " kg";
-      document.getElementById("hud_rear").innerText = rAx + " kg";
-      document.getElementById("hud_front").innerText = fAx + " kg";
-      document.getElementById("hud_van_axle").innerText = vanAxleLoad + " kg";
-      
-      document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
-      document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
-      document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
-      document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
-      document.getElementById("cap_van_axle").innerText = "MAX AXLE: " + caxLimit + "kg";
-      
-      ddocument.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
-      document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
-      document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
-      document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
-      document.getElementById("card_rear").style.borderColor = (rAx > 1959) ? "#ef4444" : "#334155";
-      document.getElementById("card_front").style.borderColor = (fAx > 1490) ? "#ef4444" : "#334155";
-      document.getElementById("card_van_axle").style.borderColor = (vanAxleLoad > caxLimit) ? "#ef4444" : "#334155";
 
-      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
+      // 📺 Telemetry Values Output Grid
+      if (document.getElementById("hud_tbm")) document.getElementById("hud_tbm").innerText = tbm + " kg";
+      if (document.getElementById("hud_tbm_pct")) document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
+      if (document.getElementById("hud_gvm")) document.getElementById("hud_gvm").innerText = uGVM + " kg";
+      if (document.getElementById("hud_vanatm")) document.getElementById("hud_vanatm").innerText = vATM + " kg";
+      if (document.getElementById("hud_gcm")) document.getElementById("hud_gcm").innerText = tGCM + " kg";
+      if (document.getElementById("hud_rear")) document.getElementById("hud_rear").innerText = rAx + " kg";
+      if (document.getElementById("hud_front")) document.getElementById("hud_front").innerText = fAx + " kg";
+
+      // 🏷️ Cap Label Overwrites (Updates Max targets layout live)
+      if (document.getElementById("cap_tbm")) document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
+      if (document.getElementById("cap_gvm")) document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
+      if (document.getElementById("cap_vanatm")) document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
+      if (document.getElementById("cap_gcm")) document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
+      if (document.getElementById("cap_rear")) document.getElementById("cap_rear").innerText = "MAX AXLE: " + vmr + "kg";
+      if (document.getElementById("cap_front")) document.getElementById("cap_front").innerText = "MAX AXLE: " + vmf + "kg";
+
+      // 🛡️ Border-Color Alert System Guard Threads
+      if (document.getElementById("card_tbm")) document.getElementById("card_tbm").style.borderColor = (tbm > vb) ? "#ef4444" : "#334155";
+      if (document.getElementById("card_tbm_pct")) document.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
+      if (document.getElementById("card_gvm")) document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
+      if (document.getElementById("vanatm")) document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
+      if (document.getElementById("card_gcm")) document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
+      if (document.getElementById("card_rear")) document.getElementById("card_rear").style.borderColor = (rAx > vmr) ? "#ef4444" : "#334155";
+      if (document.getElementById("card_front")) document.getElementById("card_front").style.borderColor = (fAx > vmf) ? "#ef4444" : "#334155";
+    
+      // 💾 Optional Auto-Save Module: Stores your active inputs safely inside your browser memory
+      const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl };
       localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
     }
     
