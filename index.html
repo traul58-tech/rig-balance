@@ -227,15 +227,30 @@
 
     function applyVehiclePreset(k) {
       const isUD = (k === "UserDefined");
-      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front"];
-      ids.forEach(id => document.getElementById("inp_" + id).disabled = !isUD);
+      const ids = ["v_tare", "v_gvm", "v_gcm", "v_tbm", "v_wb", "v_oh", "v_rear", "v_front", "v_max_rear", "v_max_front"];
+      ids.forEach(id => {
+        if(document.getElementById("inp_" + id)) {
+          document.getElementById("inp_" + id).disabled = !isUD;
+        }
+      });
       if (!isUD) {
         let p = pz[k];
-        ids.forEach((id, i) => document.getElementById("inp_" + id).value = p[i]);
+        document.getElementById("inp_v_tare").value = p.tare;
+        document.getElementById("inp_v_gvm").value = p.gvm;
+        document.getElementById("inp_v_gcm").value = p.gcm;
+        document.getElementById("inp_v_tbm").value = p.tbm;
+        document.getElementById("inp_v_wb").value = p.wb;
+        document.getElementById("inp_v_oh").value = p.oh;
+        document.getElementById("inp_v_rear").value = p.rear;
+        document.getElementById("inp_v_front").value = p.front;
+        
+        // ⚡ THE DIRECT FIX: Overwrite the blueprint inputs with the selected vehicle arrays
+        document.getElementById("inp_v_max_rear").value = p.maxRear;
+        document.getElementById("inp_v_max_front").value = p.maxFront;
       }
-      localStorage.setItem('towing_selected_preset', k);
       recalc();
     }
+
     
     function recalc() {
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
