@@ -243,15 +243,12 @@
         document.getElementById("inp_v_oh").value = p.oh;
         document.getElementById("inp_v_rear").value = p.rear;
         document.getElementById("inp_v_front").value = p.front;
-        
-        // ⚡ THE DIRECT FIX: Overwrite the blueprint inputs with the selected vehicle arrays
         document.getElementById("inp_v_max_rear").value = p.maxRear;
         document.getElementById("inp_v_max_front").value = p.maxFront;
       }
       recalc();
     }
 
-    
     function recalc() {
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
       const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
