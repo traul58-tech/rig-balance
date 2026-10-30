@@ -238,7 +238,8 @@
     }
     
     function recalc() {
-      const selVeh = document.getElementById("veh_select").value;
+      // 📡 Identify which vehicle profile is currently chosen
+      const selVeh = document.getElementById("veh_select") ? document.getElementById("veh_select").value : "NG Ranger";
       const isUD = (selVeh === "UserDefined");
 
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
@@ -250,9 +251,13 @@
       const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
       const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
 
-      // ⚡ THE DIRECT LOOKUP FIX: Pulls true legal axle capacities straight from your vehicle database array
-      const vmr = !isUD ? (pz[selVeh].maxRear || 1959) : 1959;
-      const vmf = !isUD ? (pz[selVeh].maxFront || 1490) : 1490;
+      // 🛡️ Safe Direct-Read: Accesses background memory data securely without risking a page crash
+      let vmr = 1959;
+      let vmf = 1490;
+      if (!isUD && typeof pz !== 'undefined' && pz[selVeh]) {
+        vmr = pz[selVeh].maxRear || 1959;
+        vmf = pz[selVeh].maxFront || 1490;
+      }
 
       const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
