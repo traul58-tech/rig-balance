@@ -309,6 +309,28 @@
 
       const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
       localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
+      // 🎲 QUICK TEST BLOCK: Copy and paste this temporary code snippet directly 
+      // inside your function recalc() right at the very bottom, just above the 
+      // final closing curly bracket }.
+      // This forces random test figures into your top dashboard telemetry cards 
+      // every time you move a slider or change vehicles, proving the display paths work!
+
+      const randTBM = Math.floor(Math.random() * (350 - 150 + 1)) + 150;
+      const randPct = (Math.random() * (16.0 - 6.0) + 6.0).toFixed(1);
+      const randGVM = Math.floor(Math.random() * (3350 - 2200 + 1)) + 2200;
+      const randATM = Math.floor(Math.random() * (3480 - 2500 + 1)) + 2500;
+      const randGCM = Math.floor(Math.random() * (6400 - 4500 + 1)) + 4500;
+      const randRear = Math.floor(Math.random() * (2000 - 900 + 1)) + 900;
+      const randFront = Math.floor(Math.random() * (1500 - 900 + 1)) + 900;
+
+      document.getElementById("hud_tbm").innerText = randTBM + " kg";
+      document.getElementById("hud_tbm_pct").innerText = randPct + "%";
+      document.getElementById("hud_gvm").innerText = randGVM + " kg";
+      document.getElementById("hud_vanatm").innerText = randATM + " kg";
+      document.getElementById("hud_gcm").innerText = randGCM + " kg";
+      document.getElementById("hud_rear").innerText = randRear + " kg";
+      document.getElementById("hud_front").innerText = randFront + " kg";
+
     }
     
     window.onload = function() { 
