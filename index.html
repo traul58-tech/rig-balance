@@ -122,15 +122,17 @@
         <div class="sect-title">🛻 Select Vehicle Profile (B3)</div>
         <select class="select-menu" id="veh_select" onchange="applyVehiclePreset(this.value)">
           <option value="NG Ranger">Next-Gen Ranger Wildtrak</option>
-          <option value="LC200">Toyota LandCruiser 200</option>
-          <option value="LC300">Toyota LandCruiser 300</option>
-          <option value="Y62">Nissan Patrol Y62</option>
+          <option value="LC300 Sahara">Toyota LandCruiser 300 Sahara</option>
+          <option value="Nissan Patrol Y62">Nissan Patrol Y62</option>
+          <option value="Toyota Hilux Rogue">Toyota Hilux Rogue</option>
+          <option value="Isuzu D-Max X-Terrain">Isuzu D-Max X-Terrain</option>
           <option value="BT50">Mazda BT-50 SP (3.0L)</option>
+          <option value="LC200">Toyota LandCruiser 200</option>
           <option value="LC100">Toyota LandCruiser 100</option>
-          <option value="Prado250">LandCruiser Prado 250 Series</option>
-          <option value="Hilux">Toyota Hilux SR5 (2.8L)</option>
-          <option value="TritonMV">Mitsubishi Triton (Next-Gen MV)</option>
-          <option value="DMax">Isuzu D-MAX (3.0L)</option>
+          <option value="Prado 250">LandCruiser Prado 250 Series</option>
+          <option value="Hilux SR5">Toyota Hilux SR5 (2.8L)</option>
+          <option value="Triton MV">Mitsubishi Triton (Next-Gen MV)</option>
+          <option value="D-MAX 3.0">Isuzu D-MAX (3.0L)</option>
           <option value="UserDefined">User Defined Override Mode</option>
         </select>
 
@@ -164,24 +166,20 @@
   </div>
 
   <script>
-    // 🔍 HERE IS THE MISSING COMPONENT FOR YOUR SCRIPT BLOCK:
-    // Place this data object configuration directly inside your <script> tag 
-    // right where your 'const pz = {' section begins.
-    // This updates the database array to include the missing front and rear legal limits for every profile.
-
     const pz = {
+      "LC300 Sahara": { tare: 2630, gvm: 3280, gcm: 6750, tbm: 350, wb: 2.85, oh: 1.22, rear: 1410, front: 1220, maxRear: 1920, maxFront: 1630 },
+      "Nissan Patrol Y62": { tare: 2800, gvm: 3500, gcm: 7000, tbm: 350, wb: 3.07, oh: 1.34, rear: 1540, front: 1260, maxRear: 2030, maxFront: 1650 },
+      "Toyota Hilux Rogue": { tare: 2240, gvm: 3050, gcm: 5850, tbm: 350, wb: 3.08, oh: 1.25, rear: 1010, front: 1230, maxRear: 1920, maxFront: 1350 },
+      "Isuzu D-Max X-Terrain": { tare: 2045, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.12, oh: 1.28, rear: 995, front: 1050, maxRear: 1910, maxFront: 1450 },
       "NG Ranger": { tare: 2345, gvm: 3350, gcm: 6400, tbm: 350, wb: 3.27, oh: 1.31, rear: 1044, front: 1301, maxRear: 1959, maxFront: 1490 },
-      "LC200":     { tare: 2740, gvm: 3350, gcm: 6850, tbm: 350, wb: 2.85, oh: 1.21, rear: 1450, front: 1290, maxRear: 1950, maxFront: 1630 },
-      "LC300":     { tare: 2630, gvm: 3280, gcm: 6750, tbm: 350, wb: 2.85, oh: 1.22, rear: 1410, front: 1220, maxRear: 1920, maxFront: 1630 },
-      "Y62":       { tare: 2800, gvm: 3500, gcm: 7000, tbm: 350, wb: 3.07, oh: 1.34, rear: 1540, front: 1260, maxRear: 2030, maxFront: 1650 },
-      "BT50":      { tare: 2035, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.12, oh: 1.29, rear: 990,  front: 1045, maxRear: 1910, maxFront: 1450 },
-      "LC100":     { tare: 2520, gvm: 3260, gcm: 6760, tbm: 350, wb: 2.85, oh: 1.19, rear: 1320, front: 1200, maxRear: 1950, maxFront: 1300 },
-      "Prado 250": { tare: 2450, gvm: 3100, gcm: 6600, tbm: 350, wb: 2.85, oh: 1.22, rear: 1180, front: 1270, maxRear: 1800, maxFront: 1450 },
-      "Hilux SR5": { tare: 2110, gvm: 3050, gcm: 5850, tbm: 350, wb: 3.09, oh: 1.25, rear: 960,  front: 1150, maxRear: 1920, maxFront: 1350 },
-      "Triton MV": { tare: 2170, gvm: 3200, gcm: 6200, tbm: 350, wb: 3.13, oh: 1.25, rear: 990,  front: 1180, maxRear: 1985, maxFront: 1450 },
-      "D-MAX 3.0": { tare: 2115, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.13, oh: 1.28, rear: 975,  front: 1140, maxRear: 1910, maxFront: 1450 }
+      "BT50": { tare: 2035, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.12, oh: 1.29, rear: 990, front: 1045, maxRear: 1910, maxFront: 1450 },
+      "LC200": { tare: 2740, gvm: 3350, gcm: 6850, tbm: 350, wb: 2.85, oh: 1.21, rear: 1450, front: 1290, maxRear: 1950, maxFront: 1630 },
+      "LC100": { tare: 2520, gvm: 3260, gcm: 6760, tbm: 350, wb: 2.85, oh: 1.19, rear: 1320, front: 1200, maxRear: 1950, maxFront: 1300 },
+      "Prado 250": { tare: 2410, gvm: 3100, gcm: 6600, tbm: 350, wb: 2.85, oh: 1.20, rear: 1280, front: 1130, maxRear: 1800, maxFront: 1450 },
+      "Hilux SR5": { tare: 2100, gvm: 3050, gcm: 5850, tbm: 350, wb: 3.08, oh: 1.25, rear: 1010, front: 1090, maxRear: 1920, maxFront: 1350 },
+      "Triton MV": { tare: 2010, gvm: 3200, gcm: 6205, tbm: 350, wb: 3.13, oh: 1.27, rear: 960, front: 1050, maxRear: 1985, maxFront: 1450 },
+      "D-MAX 3.0": { tare: 2045, gvm: 3100, gcm: 6000, tbm: 350, wb: 3.12, oh: 1.28, rear: 995, front: 1050, maxRear: 1910, maxFront: 1450 }
     };
-
     const arms = { B20: 3.75, B21: 3.0, B22: 1.8, B23: 0.0, B24: -1.5, B25: -2.25, B26: 0.0, B27: 0.0 };
     const defW = { B20: 75.3, B21: 79.1, B22: 95, B23: 89, B24: 95, B25: 75.2, B26: 205, B27: 127.6 };
     const maxL = { B20: 150, B21: 150, B22: 150, B23: 500, B24: 150, B25: 150, B26: 400, B27: 600 };
@@ -244,10 +242,6 @@
     }
     
     function recalc() {
-      // 📡 Identify which vehicle profile is currently chosen
-      const selVeh = document.getElementById("veh_select") ? document.getElementById("veh_select").value : "NG Ranger";
-      const isUD = (selVeh === "UserDefined");
-
       const vt = parseFloat(document.getElementById("inp_v_tare").value) || 0;
       const vg = parseFloat(document.getElementById("inp_v_gvm").value) || 0;
       const vc = parseFloat(document.getElementById("inp_v_gcm").value) || 0;
@@ -256,20 +250,10 @@
       const vo = parseFloat(document.getElementById("inp_v_oh").value) || 0;
       const vr = parseFloat(document.getElementById("inp_v_rear").value) || 0;
       const vf = parseFloat(document.getElementById("inp_v_front").value) || 0;
-
-      // 🛡️ Safe Direct-Read: Accesses background memory data securely without risking a page crash
-      let vmr = 1959;
-      let vmf = 1490;
-      if (!isUD && typeof pz !== 'undefined' && pz[selVeh]) {
-        vmr = pz[selVeh].maxRear || 1959;
-        vmf = pz[selVeh].maxFront || 1490;
-      }
-
       const ct = parseFloat(document.getElementById("inp_c_tbm").value) || 0;
       const ca = parseFloat(document.getElementById("inp_c_tare").value) || 0;
       const cm = parseFloat(document.getElementById("inp_c_atm").value) || 0;
       const cl = parseFloat(document.getElementById("inp_c_len").value) || 1;
-
       const caxLimit = parseFloat(document.getElementById("inp_c_axle_limit").value) || 3200;
       
       let tQ = 0, cC = 0;
@@ -309,55 +293,8 @@
 
       const overrides = { vt, vg, vc, vb, vw, vo, vr, vf, ct, ca, cm, cl, caxLimit };
       localStorage.setItem('towing_input_overrides', JSON.stringify(overrides));
-      // 🎲 QUICK TEST BLOCK: Copy and paste this temporary code snippet directly 
-      // inside your function recalc() right at the very bottom, just above the 
-      // final closing curly bracket }.
-      // This forces random test figures into your top dashboard telemetry cards 
-      // every time you move a slider or change vehicles, proving the display paths work!
-
-      const randTBM = Math.floor(Math.random() * (350 - 150 + 1)) + 150;
-      const randPct = (Math.random() * (16.0 - 6.0) + 6.0).toFixed(1);
-      const randGVM = Math.floor(Math.random() * (3350 - 2200 + 1)) + 2200;
-      const randATM = Math.floor(Math.random() * (3480 - 2500 + 1)) + 2500;
-      const randGCM = Math.floor(Math.random() * (6400 - 4500 + 1)) + 4500;
-      const randRear = Math.floor(Math.random() * (2000 - 900 + 1)) + 900;
-      const randFront = Math.floor(Math.random() * (1500 - 900 + 1)) + 900;
-
-      // 📺 Telemetry Values Output Grid
-      document.getElementById("hud_tbm").innerText = tbm + " kg";
-      document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
-      document.getElementById("hud_gvm").innerText = uGVM + " kg";
-      document.getElementById("hud_vanatm").innerText = vATM + " kg";
-      document.getElementById("hud_gcm").innerText = tGCM + " kg";
-      document.getElementById("hud_rear").innerText = rAx + " kg";
-      document.getElementById("hud_front").innerText = fAx + " kg";
-
-      // 🏷️ Dynamic Target Label Overwrites (Bypasses missing input boxes entirely)
-      document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
-      document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
-      document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
-      document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
-
-      // ⚡ CRITICAL MISSING CONNECTION FIXED HERE:
-      // Dynamically reads the chosen vehicle's true capacities straight from your 'pz' data table
-      const currentVehicleSelection = document.getElementById("veh_select").value;
-      const activeMaxRear = (currentVehicleSelection !== "UserDefined" && pz[currentVehicleSelection]) ? pz[currentVehicleSelection].maxRear : 1959;
-      const activeMaxFront = (currentVehicleSelection !== "UserDefined" && pz[currentVehicleSelection]) ? pz[currentVehicleSelection].maxFront : 1490;
-
-      // Forcefully overwrites the top summary cards with the real legal limits live
-      document.getElementById("cap_rear").innerText = "MAX AXLE: " + activeMaxRear + "kg";
-      document.getElementById("cap_front").innerText = "MAX AXLE: " + activeMaxFront + "kg";
-
-      // 🛡️ Safety Border-Color Alert System Guards
-      document.getElementById("card_tbm").style.borderColor = (tbm > vb) ? "#ef4444" : "#334155";
-      document.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
-      document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
-      document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
-      document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
-      document.getElementById("card_rear").style.borderColor = (rAx > activeMaxRear) ? "#ef4444" : "#334155";
-      document.getElementById("card_front").style.borderColor = (fAx > activeMaxFront) ? "#ef4444" : "#334155";
     }
- 
+    
     window.onload = function() { 
       const savedWeights = localStorage.getItem('towing_slider_weights');
       if (savedWeights) {
