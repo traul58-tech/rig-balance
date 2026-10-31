@@ -323,16 +323,41 @@
       const randRear = Math.floor(Math.random() * (2000 - 900 + 1)) + 900;
       const randFront = Math.floor(Math.random() * (1500 - 900 + 1)) + 900;
 
-      document.getElementById("hud_tbm").innerText = randTBM + " kg";
-      document.getElementById("hud_tbm_pct").innerText = randPct + "%";
-      document.getElementById("hud_gvm").innerText = randGVM + " kg";
-      document.getElementById("hud_vanatm").innerText = randATM + " kg";
-      document.getElementById("hud_gcm").innerText = randGCM + " kg";
-      document.getElementById("hud_rear").innerText = randRear + " kg";
-      document.getElementById("hud_front").innerText = randFront + " kg";
+      // 📺 Telemetry Values Output Grid
+      document.getElementById("hud_tbm").innerText = tbm + " kg";
+      document.getElementById("hud_tbm_pct").innerText = tbmPct + "%";
+      document.getElementById("hud_gvm").innerText = uGVM + " kg";
+      document.getElementById("hud_vanatm").innerText = vATM + " kg";
+      document.getElementById("hud_gcm").innerText = tGCM + " kg";
+      document.getElementById("hud_rear").innerText = rAx + " kg";
+      document.getElementById("hud_front").innerText = fAx + " kg";
 
+      // 🏷️ Dynamic Target Label Overwrites (Bypasses missing input boxes entirely)
+      document.getElementById("cap_tbm").innerText = "MAX TBM: " + vb + "kg";
+      document.getElementById("cap_gvm").innerText = "MAX GVM: " + vg + "kg";
+      document.getElementById("cap_vanatm").innerText = "MAX ATM: " + cm + "kg";
+      document.getElementById("cap_gcm").innerText = "MAX GCM: " + vc + "kg";
+
+      // ⚡ CRITICAL MISSING CONNECTION FIXED HERE:
+      // Dynamically reads the chosen vehicle's true capacities straight from your 'pz' data table
+      const currentVehicleSelection = document.getElementById("veh_select").value;
+      const activeMaxRear = (currentVehicleSelection !== "UserDefined" && pz[currentVehicleSelection]) ? pz[currentVehicleSelection].maxRear : 1959;
+      const activeMaxFront = (currentVehicleSelection !== "UserDefined" && pz[currentVehicleSelection]) ? pz[currentVehicleSelection].maxFront : 1490;
+
+      // Forcefully overwrites the top summary cards with the real legal limits live
+      document.getElementById("cap_rear").innerText = "MAX AXLE: " + activeMaxRear + "kg";
+      document.getElementById("cap_front").innerText = "MAX AXLE: " + activeMaxFront + "kg";
+
+      // 🛡️ Safety Border-Color Alert System Guards
+      document.getElementById("card_tbm").style.borderColor = (tbm > vb) ? "#ef4444" : "#334155";
+      document.getElementById("card_tbm_pct").style.borderColor = (parseFloat(tbmPct) < 8.0 || parseFloat(tbmPct) > 15.0) ? "#ef4444" : "#334155";
+      document.getElementById("card_gvm").style.borderColor = (uGVM > vg) ? "#ef4444" : "#334155";
+      document.getElementById("vanatm").style.borderColor = (vATM > cm) ? "#ef4444" : "#334155";
+      document.getElementById("card_gcm").style.borderColor = (tGCM > vc) ? "#ef4444" : "#334155";
+      document.getElementById("card_rear").style.borderColor = (rAx > activeMaxRear) ? "#ef4444" : "#334155";
+      document.getElementById("card_front").style.borderColor = (fAx > activeMaxFront) ? "#ef4444" : "#334155";
     }
-    
+ 
     window.onload = function() { 
       const savedWeights = localStorage.getItem('towing_slider_weights');
       if (savedWeights) {
