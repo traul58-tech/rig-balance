@@ -1,0 +1,3 @@
+{
+  "install": "set -euo pipefail; missing=(); for cmd in jq python3; do command -v \"$cmd\" >/dev/null 2>&1 || missing+=(\"$cmd\"); done; if [ ${#missing[@]} -gt 0 ]; then sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \"${missing[@]}\"; fi; jq empty manifest.json && test -f index.html"
+}
